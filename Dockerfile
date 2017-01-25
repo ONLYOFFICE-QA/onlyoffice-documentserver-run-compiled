@@ -40,7 +40,9 @@ RUN service postgresql start && \
     sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE onlyoffice TO onlyoffice;"
 RUN service postgresql start && \
     PGPASSWORD=onlyoffice psql -hlocalhost -Uonlyoffice -d onlyoffice -f /var/www/onlyoffice/documentserver/server/schema/postgresql/createdb.sql
-EXPOSE 80
+EXPOSE 80 3000
+RUN git clone https://github.com/ONLYOFFICE/document-server-integration.git
+COPY local.json /document-server-integration/web/documentserver-example/nodejs/config/local.json
 CMD service postgresql start && \
     service rabbitmq-server start && \
     service redis-server start && \
@@ -53,4 +55,5 @@ CMD service postgresql start && \
     sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/SpellChecker/sources/server.js &) && \
     (export NODE_ENV=production-linux NODE_CONFIG_DIR=/etc/onlyoffice/documentserver && \
     sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/DocService/sources/server.js &) && \
+    (document-server-integration/web/documentserver-example/nodejs/run-mac.command &) && \
     bash
