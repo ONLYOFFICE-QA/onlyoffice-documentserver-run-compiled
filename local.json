@@ -1,6 +1,0 @@
-{
-  "server": {
-    "port": 3000,
-    "siteUrl": "http://external_url_or_dns/"
-  }
-}
