@@ -27,6 +27,8 @@ RUN cd DocumentServer/core/Common/3dParty && ./make.sh
 RUN cd DocumentServer/core && make
 RUN cd DocumentServer/sdkjs && make
 RUN cd DocumentServer/server && make
+# enable multiverse for ttf-mscorefonts-installer
+RUN echo "deb http://archive.ubuntu.com/ubuntu trusty multiverse" | tee -a /etc/apt/sources.list
 RUN apt-get update && \
     apt-get install -y \
     adduser \
@@ -40,6 +42,7 @@ RUN apt-get update && \
     zlib1g \
     fonts-dejavu \
     fonts-liberation \
+    ttf-mscorefonts-installer \
     fonts-crosextra-carlito \
     fonts-takao-gothic \
     fonts-opensymbol \
