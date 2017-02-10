@@ -27,7 +27,28 @@ RUN cd DocumentServer/core/Common/3dParty && ./make.sh
 RUN cd DocumentServer/core && make
 RUN cd DocumentServer/sdkjs && make
 RUN cd DocumentServer/server && make
-RUN apt-get update && apt-get install -y adduser redis-server rabbitmq-server nodejs libstdc++6 libcurl3 libxml2 libboost-regex-dev zlib1g fonts-dejavu fonts-liberation fonts-crosextra-carlito fonts-takao-gothic fonts-opensymbol libxss1 libcairo2 xvfb libxtst6 libgconf2-4 libasound2
+RUN apt-get update && \
+    apt-get install -y \
+    adduser \
+    redis-server \
+    rabbitmq-server \
+    nodejs \
+    libstdc++6 \
+    libcurl3 \
+    libxml2 \
+    libboost-regex-dev \
+    zlib1g \
+    fonts-dejavu \
+    fonts-liberation \
+    fonts-crosextra-carlito \
+    fonts-takao-gothic \
+    fonts-opensymbol \
+    libxss1 \
+    libcairo2 \
+    xvfb \
+    libxtst6 \
+    libgconf2-4 \
+    libasound2
 RUN cd DocumentServer/server && make install
 RUN apt-get update && apt-get install -y nginx
 RUN rm -f /etc/nginx/sites-enabled/default
