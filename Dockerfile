@@ -1,4 +1,5 @@
 FROM ubuntu:14.04
+ARG build_branch=master
 RUN apt-get update && apt-get install -yq curl apt-transport-https ca-certificates
 RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 RUN apt-get update && apt-get install -y nodejs
@@ -23,6 +24,7 @@ RUN apt-get update && \
     git \
     subversion
 RUN git clone --recursive https://github.com/ONLYOFFICE/DocumentServer.git
+RUN cd DocumentServer && git submodule foreach --recursive git checkout $build_branch
 RUN cd DocumentServer/core/Common/3dParty && ./make.sh
 RUN cd DocumentServer/core && make
 RUN cd DocumentServer/sdkjs && make
