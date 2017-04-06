@@ -3,7 +3,7 @@ This docker is created from command from manual http://helpcenter.onlyoffice.com
 
 ```
 BUILD_BRANCH=master && \
-ufw disable && \
+ufw allow www && \
 EXTERNAL_IP=$(curl ipinfo.io/ip) && \
 git clone https://github.com/onlyoffice-testing-robot/documentserver-docker-from-manual.git && \
 docker build --build-arg build_branch=$BUILD_BRANCH -t documentserver documentserver-docker-from-manual && \
