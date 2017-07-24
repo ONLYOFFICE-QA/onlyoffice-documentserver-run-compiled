@@ -25,7 +25,11 @@ RUN apt-get update && \
     subversion
 RUN git clone --recursive https://github.com/ONLYOFFICE/DocumentServer.git
 RUN cd DocumentServer && git submodule foreach --recursive git checkout $build_branch
-RUN cd DocumentServer/core/Common/3dParty && ./make.sh
+RUN cd DocumentServer/core/Common/3dParty && \
+    ./make.sh && \
+    rm v8/v8/third_party/binutils/Linux_x64/Release/bin/ld.gold && \
+    ln -s /usr/bin/ld.gold v8/v8/third_party/binutils/Linux_x64/Release/bin/ld.gold && \
+    ./make.sh
 RUN cd DocumentServer/core && make
 RUN cd DocumentServer/sdkjs && make
 RUN cd DocumentServer/server && make
