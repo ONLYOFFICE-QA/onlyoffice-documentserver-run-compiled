@@ -35,6 +35,7 @@ RUN cd DocumentServer/sdkjs && make
 RUN cd DocumentServer/server && make
 # enable multiverse for ttf-mscorefonts-installer
 RUN echo "deb http://archive.ubuntu.com/ubuntu trusty multiverse" | tee -a /etc/apt/sources.list
+RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | sudo debconf-set-selections
 RUN apt-get update && \
     apt-get install -y \
     adduser \
