@@ -1,0 +1,18 @@
+FROM finalduty/archlinux:daily
+ARG build_branch=master
+RUN pacman -S --noconfirm nodejs npm
+RUN npm install -g grunt-cli
+RUN pacman -S --noconfirm \
+    git
+RUN git clone --recursive https://github.com/ONLYOFFICE/DocumentServer.git
+RUN cd DocumentServer && git submodule foreach --recursive git checkout $build_branch
+RUN pacman -S --noconfirm \
+    make \
+    git \
+    gcc \
+    p7zip \
+    python2 \
+    qt5-base \
+    wget
+RUN cd /usr/bin && ln -sf python2 python && ls -l python
+RUN cd DocumentServer/core/Common/3dParty && ./make.sh
