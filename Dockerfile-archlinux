@@ -9,10 +9,15 @@ RUN cd DocumentServer && git submodule foreach --recursive git checkout $build_b
 RUN pacman -S --noconfirm \
     make \
     git \
-    gcc \
+    gcc6 \
     p7zip \
     python2 \
     qt5-base \
     wget
-RUN ln -sf /usr/bin/python2 /usr/bin/python
+RUN ln -sf /usr/bin/python2 /usr/bin/python && \
+    ln -sf /usr/bin/g++-6 /usr/bin/g++ && \
+    ln -sf /usr/bin/cpp-6 /usr/bin/cpp && \
+    ln -sf /usr/bin/gcc-6 /usr/bin/gcc && \
+    ln -sf /usr/bin/c++-6 /usr/bin/c++ && \
+    ln -sf /usr/bin/cc-6 /usr/bin/cc
 RUN cd DocumentServer/core/Common/3dParty && ./make.sh
