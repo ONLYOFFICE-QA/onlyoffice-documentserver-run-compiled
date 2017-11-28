@@ -14,5 +14,5 @@ RUN pacman -S --noconfirm \
     python2 \
     qt5-base \
     wget
-RUN cd /usr/bin && ln -sf python2 python && ls -l python
+RUN ln -sf /usr/bin/python2 /usr/bin/python
 RUN cd DocumentServer/core/Common/3dParty && ./make.sh
