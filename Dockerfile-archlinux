@@ -25,3 +25,4 @@ RUN sed -i 's/-fPIC/-Wno-unused-function -Wno-unused-variable -fPIC/g' DocumentS
 # force system binutils, see: https://bbs.archlinux.org/viewtopic.php?id=209871
 RUN sed -i 's/-Dclang=0/"-Dclang=0 -Dlinux_use_bundled_gold=0"/g' DocumentServer/core/Common/3dParty/v8/build.sh
 RUN cd DocumentServer/core/Common/3dParty && ./make.sh
+RUN cd DocumentServer/core && make
