@@ -20,4 +20,8 @@ RUN ln -sf /usr/bin/python2 /usr/bin/python && \
     ln -sf /usr/bin/gcc-6 /usr/bin/gcc && \
     ln -sf /usr/bin/c++-6 /usr/bin/c++ && \
     ln -sf /usr/bin/cc-6 /usr/bin/cc
+# patching v8 compile error
+RUN sed -i 's/-fPIC/-Wno-unused-function -Wno-unused-variable -fPIC/g' DocumentServer/core/Common/3dParty/v8/build.sh
+# force system binutils, see: https://bbs.archlinux.org/viewtopic.php?id=209871
+RUN sed -i 's/-Dclang=0/"-Dclang=0 -Dlinux_use_bundled_gold=0"/g' DocumentServer/core/Common/3dParty/v8/build.sh
 RUN cd DocumentServer/core/Common/3dParty && ./make.sh
