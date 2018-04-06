@@ -1,0 +1,8 @@
+FROM gentoo/portage:latest as portage
+FROM gentoo/stage3-amd64:latest
+COPY --from=portage /usr/portage /usr/portage
+RUN emerge -qv dev-vcs/git
+RUN git clone --recursive https://github.com/ONLYOFFICE/DocumentServer.git
+RUN emerge -qv app-arch/p7zip
+RUN eselect python set 2 # Using pythong3 cause error in v8 fetching `No module named 'urlparse'`
+RUN cd DocumentServer/core/Common/3dParty && ./make.sh
