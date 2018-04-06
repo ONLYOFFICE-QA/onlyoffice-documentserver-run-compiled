@@ -1,5 +1,6 @@
 FROM finalduty/archlinux:daily
 ARG build_branch=master
+RUN pacman -Syyu --noconfirm
 RUN pacman -S --noconfirm nodejs npm
 RUN npm install -g grunt-cli
 RUN pacman -S --noconfirm \
