@@ -1,7 +1,7 @@
 FROM finalduty/archlinux:daily
 ARG build_branch=master
 RUN pacman -Syyu --noconfirm
-RUN pacman -S --noconfirm nodejs npm
+RUN pacman -S --noconfirm nodejs-lts-boron npm
 RUN npm install -g grunt-cli
 RUN pacman -S --noconfirm \
     git
@@ -12,12 +12,19 @@ RUN pacman -S --noconfirm \
     automake \
     make \
     git \
-    gcc \
+    gcc5 \
+    gcc7 \
+    java-runtime \
+    nginx \
     p7zip \
-    python \
+    pkg-config \
+    postgresql \
+    python2 \
+    sudo \
     svn \
     qt5-base \
     wget
+RUN ln -sf /usr/bin/python2 /usr/bin/python    
 RUN cd DocumentServer/core/Common/3dParty/boost && bash fetch.sh  
 RUN cd DocumentServer/core/Common/3dParty/boost && bash build.sh  
 RUN cd DocumentServer/core/Common/3dParty/cef && bash fetch.sh  
@@ -27,16 +34,13 @@ RUN cd DocumentServer/core/Common/3dParty/curl && bash build.sh
 RUN cd DocumentServer/core/Common/3dParty/icu && bash fetch.sh && sed -i 's/xlocale/locale/' linux_64/icu/source/i18n/digitlst.cpp && bash fetch.sh
 RUN cd DocumentServer/core/Common/3dParty/openssl && bash fetch.sh 
 RUN cd DocumentServer/core/Common/3dParty/openssl && bash build.sh 
-RUN pacman -S --noconfirm python2 && ln -sf /usr/bin/python2 /usr/bin/python
 RUN cd DocumentServer/core/Common/3dParty/v8 && bash fetch.sh 
-RUN pacman -S --noconfirm pkg-config gcc5
 RUN ln -sf /usr/bin/g++-5 /usr/bin/g++ && \
     ln -sf /usr/bin/cpp-5 /usr/bin/cpp && \
     ln -sf /usr/bin/gcc-5 /usr/bin/gcc && \
     ln -sf /usr/bin/c++-5 /usr/bin/c++ && \
     ln -sf /usr/bin/cc-5 /usr/bin/cc
 RUN cd DocumentServer/core/Common/3dParty/v8 && bash build.sh 
-RUN pacman -S --noconfirm pkg-config gcc7
 RUN ln -sf /usr/bin/g++-7 /usr/bin/g++ && \
     ln -sf /usr/bin/cpp-7 /usr/bin/cpp && \
     ln -sf /usr/bin/gcc-7 /usr/bin/gcc && \
@@ -44,20 +48,14 @@ RUN ln -sf /usr/bin/g++-7 /usr/bin/g++ && \
     ln -sf /usr/bin/cc-7 /usr/bin/cc
 # RUN cd DocumentServer/core/Common/3dParty && ./make.sh
 RUN cd DocumentServer/core && make
-RUN pacman -S --noconfirm java-runtime
 RUN cd DocumentServer/sdkjs && make
-RUN pacman -Rdd --noconfirm nodejs
-RUN pacman -S --noconfirm nodejs-lts-boron
 RUN cd DocumentServer/server && make
-RUN pacman -S --noconfirm sudo
 RUN sed -i 's/sudo adduser --quiet --home \/var\/www\/onlyoffice --system --group onlyoffice/useradd -d \/var\/www\/onlyoffice\/ onlyoffice/' DocumentServer/server/Makefile
 RUN cd DocumentServer/server && make install
-RUN pacman -S --noconfirm nginx
 RUN rm -f /etc/nginx/sites-enabled/default
 COPY onlyoffice-documentserver /etc/nginx/sites-available/onlyoffice-documentserver
 RUN mkdir -pv /etc/nginx/sites-enabled/
 RUN ln -s /etc/nginx/sites-available/onlyoffice-documentserver /etc/nginx/sites-enabled/onlyoffice-documentserver
-RUN pacman -S --noconfirm postgresql
 RUN systemctl start postgresql && \
     sudo -u postgres psql -c "CREATE DATABASE onlyoffice;" && \
     sudo -u postgres psql -c "CREATE USER onlyoffice WITH password 'onlyoffice';" && \
