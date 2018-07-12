@@ -8,22 +8,74 @@ RUN pacman -S --noconfirm \
 RUN git clone --recursive https://github.com/ONLYOFFICE/DocumentServer.git
 RUN cd DocumentServer && git submodule foreach --recursive git checkout $build_branch
 RUN pacman -S --noconfirm \
+    autoconf \
+    automake \
     make \
     git \
-    gcc6 \
+    gcc \
     p7zip \
-    python2 \
+    python \
+    svn \
     qt5-base \
     wget
-RUN ln -sf /usr/bin/python2 /usr/bin/python && \
-    ln -sf /usr/bin/g++-6 /usr/bin/g++ && \
-    ln -sf /usr/bin/cpp-6 /usr/bin/cpp && \
-    ln -sf /usr/bin/gcc-6 /usr/bin/gcc && \
-    ln -sf /usr/bin/c++-6 /usr/bin/c++ && \
-    ln -sf /usr/bin/cc-6 /usr/bin/cc
-# patching v8 compile error
-RUN sed -i 's/-fPIC/-Wno-unused-function -Wno-unused-variable -fPIC/g' DocumentServer/core/Common/3dParty/v8/build.sh
-# force system binutils, see: https://bbs.archlinux.org/viewtopic.php?id=209871
-RUN sed -i 's/-Dclang=0/"-Dclang=0 -Dlinux_use_bundled_gold=0"/g' DocumentServer/core/Common/3dParty/v8/build.sh
-RUN cd DocumentServer/core/Common/3dParty && ./make.sh
+RUN cd DocumentServer/core/Common/3dParty/boost && bash fetch.sh  
+RUN cd DocumentServer/core/Common/3dParty/boost && bash build.sh  
+RUN cd DocumentServer/core/Common/3dParty/cef && bash fetch.sh  
+RUN cd DocumentServer/core/Common/3dParty/cef && bash build.sh  
+RUN cd DocumentServer/core/Common/3dParty/curl && bash fetch.sh 
+RUN cd DocumentServer/core/Common/3dParty/curl && bash build.sh 
+RUN cd DocumentServer/core/Common/3dParty/icu && bash fetch.sh && sed -i 's/xlocale/locale/' linux_64/icu/source/i18n/digitlst.cpp && bash fetch.sh
+RUN cd DocumentServer/core/Common/3dParty/openssl && bash fetch.sh 
+RUN cd DocumentServer/core/Common/3dParty/openssl && bash build.sh 
+RUN pacman -S --noconfirm python2 && ln -sf /usr/bin/python2 /usr/bin/python
+RUN cd DocumentServer/core/Common/3dParty/v8 && bash fetch.sh 
+RUN pacman -S --noconfirm pkg-config gcc5
+RUN ln -sf /usr/bin/g++-5 /usr/bin/g++ && \
+    ln -sf /usr/bin/cpp-5 /usr/bin/cpp && \
+    ln -sf /usr/bin/gcc-5 /usr/bin/gcc && \
+    ln -sf /usr/bin/c++-5 /usr/bin/c++ && \
+    ln -sf /usr/bin/cc-5 /usr/bin/cc
+RUN cd DocumentServer/core/Common/3dParty/v8 && bash build.sh 
+RUN pacman -S --noconfirm pkg-config gcc7
+RUN ln -sf /usr/bin/g++-7 /usr/bin/g++ && \
+    ln -sf /usr/bin/cpp-7 /usr/bin/cpp && \
+    ln -sf /usr/bin/gcc-7 /usr/bin/gcc && \
+    ln -sf /usr/bin/c++-7 /usr/bin/c++ && \
+    ln -sf /usr/bin/cc-7 /usr/bin/cc
+# RUN cd DocumentServer/core/Common/3dParty && ./make.sh
 RUN cd DocumentServer/core && make
+RUN pacman -S --noconfirm java-runtime
+RUN cd DocumentServer/sdkjs && make
+RUN pacman -Rdd --noconfirm nodejs
+RUN pacman -S --noconfirm nodejs-lts-boron
+RUN cd DocumentServer/server && make
+RUN pacman -S --noconfirm sudo
+RUN sed -i 's/sudo adduser --quiet --home \/var\/www\/onlyoffice --system --group onlyoffice/useradd -d \/var\/www\/onlyoffice\/ onlyoffice/' DocumentServer/server/Makefile
+RUN cd DocumentServer/server && make install
+RUN pacman -S --noconfirm nginx
+RUN rm -f /etc/nginx/sites-enabled/default
+COPY onlyoffice-documentserver /etc/nginx/sites-available/onlyoffice-documentserver
+RUN mkdir -pv /etc/nginx/sites-enabled/
+RUN ln -s /etc/nginx/sites-available/onlyoffice-documentserver /etc/nginx/sites-enabled/onlyoffice-documentserver
+RUN pacman -S --noconfirm postgresql
+RUN systemctl start postgresql && \
+    sudo -u postgres psql -c "CREATE DATABASE onlyoffice;" && \
+    sudo -u postgres psql -c "CREATE USER onlyoffice WITH password 'onlyoffice';" && \
+    sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE onlyoffice TO onlyoffice;"
+RUN service postgresql start && \
+    PGPASSWORD=onlyoffice psql -hlocalhost -Uonlyoffice -d onlyoffice -f /var/www/onlyoffice/documentserver/server/schema/postgresql/createdb.sql
+EXPOSE 80
+CMD service postgresql start && \
+    service rabbitmq-server start && \
+    service redis-server start && \
+    service nginx start && \
+    service postgresql start && \
+    (cd /var/www/onlyoffice/documentserver/server/FileConverter/sources/ && \
+    export NODE_ENV=production-linux NODE_CONFIG_DIR=/etc/onlyoffice/documentserver && \
+    sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/FileConverter/sources/convertermaster.js &) && \
+    (export NODE_ENV=production-linux NODE_CONFIG_DIR=/etc/onlyoffice/documentserver && \
+    sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/SpellChecker/sources/server.js &) && \
+    (export NODE_ENV=production-linux NODE_CONFIG_DIR=/etc/onlyoffice/documentserver && \
+    sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/DocService/sources/server.js &) && \
+    bash
+ 
