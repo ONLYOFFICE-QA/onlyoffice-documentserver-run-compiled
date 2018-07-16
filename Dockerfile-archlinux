@@ -6,18 +6,16 @@ RUN npm install -g grunt-cli
 RUN pacman -S --noconfirm \
     git
 RUN git clone --recursive https://github.com/ONLYOFFICE/DocumentServer.git
-RUN cd DocumentServer && git submodule foreach --recursive git checkout $build_branch
+RUN cd DocumentServer && git submodule foreach --recursive git checkout develop
 RUN pacman -S --noconfirm \
     autoconf \
     automake \
     make \
     git \
-    gcc5 \
-    gcc7 \
+    gcc \
     java-runtime \
     nginx \
     p7zip \
-    pkg-config \
     postgresql \
     python2 \
     sudo \
@@ -25,32 +23,10 @@ RUN pacman -S --noconfirm \
     qt5-base \
     wget
 RUN ln -sf /usr/bin/python2 /usr/bin/python    
-RUN cd DocumentServer/core/Common/3dParty/boost && bash fetch.sh  
-RUN cd DocumentServer/core/Common/3dParty/boost && bash build.sh  
-RUN cd DocumentServer/core/Common/3dParty/cef && bash fetch.sh  
-RUN cd DocumentServer/core/Common/3dParty/cef && bash build.sh  
-RUN cd DocumentServer/core/Common/3dParty/curl && bash fetch.sh 
-RUN cd DocumentServer/core/Common/3dParty/curl && bash build.sh 
-RUN cd DocumentServer/core/Common/3dParty/icu && bash fetch.sh && sed -i 's/xlocale/locale/' linux_64/icu/source/i18n/digitlst.cpp && bash fetch.sh
-RUN cd DocumentServer/core/Common/3dParty/openssl && bash fetch.sh 
-RUN cd DocumentServer/core/Common/3dParty/openssl && bash build.sh 
-RUN cd DocumentServer/core/Common/3dParty/v8 && bash fetch.sh 
-RUN ln -sf /usr/bin/g++-5 /usr/bin/g++ && \
-    ln -sf /usr/bin/cpp-5 /usr/bin/cpp && \
-    ln -sf /usr/bin/gcc-5 /usr/bin/gcc && \
-    ln -sf /usr/bin/c++-5 /usr/bin/c++ && \
-    ln -sf /usr/bin/cc-5 /usr/bin/cc
-RUN cd DocumentServer/core/Common/3dParty/v8 && bash build.sh 
-RUN ln -sf /usr/bin/g++-7 /usr/bin/g++ && \
-    ln -sf /usr/bin/cpp-7 /usr/bin/cpp && \
-    ln -sf /usr/bin/gcc-7 /usr/bin/gcc && \
-    ln -sf /usr/bin/c++-7 /usr/bin/c++ && \
-    ln -sf /usr/bin/cc-7 /usr/bin/cc
-# RUN cd DocumentServer/core/Common/3dParty && ./make.sh
+RUN cd DocumentServer/core/Common/3dParty && ./make.sh
 RUN cd DocumentServer/core && make
 RUN cd DocumentServer/sdkjs && make
 RUN cd DocumentServer/server && make
-RUN sed -i 's/sudo adduser --quiet --home \/var\/www\/onlyoffice --system --group onlyoffice/useradd -d \/var\/www\/onlyoffice\/ onlyoffice/' DocumentServer/server/Makefile
 RUN cd DocumentServer/server && make install
 RUN rm -f /etc/nginx/sites-enabled/default
 COPY onlyoffice-documentserver /etc/nginx/sites-available/onlyoffice-documentserver
