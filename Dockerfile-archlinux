@@ -17,6 +17,7 @@ RUN pacman -S --noconfirm \
     nginx \
     p7zip \
     postgresql \
+    pkg-config \
     python2 \
     sudo \
     svn \
