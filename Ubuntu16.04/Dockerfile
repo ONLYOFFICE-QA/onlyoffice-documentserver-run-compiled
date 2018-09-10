@@ -7,6 +7,7 @@ RUN npm install -g grunt-cli
 RUN apt-get update && \
     apt-get install --force-yes -yq \
     wget \
+    autoconf \
     build-essential \
     libcurl4-gnutls-dev \
     libglib2.0-dev \
@@ -14,6 +15,7 @@ RUN apt-get update && \
     libgtkglext1-dev \
     libatk1.0-dev \
     libcairo2-dev \
+    libtool \
     libxml2-dev \
     libxss-dev \
     libgconf2-dev \
