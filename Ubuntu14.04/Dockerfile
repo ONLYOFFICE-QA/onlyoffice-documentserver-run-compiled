@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 ARG build_branch=master
 RUN apt-get update && apt-get install -yq curl apt-transport-https ca-certificates
-RUN curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 RUN apt-get update && apt-get install -y nodejs
 RUN npm install -g grunt-cli
 RUN apt-get update && \
