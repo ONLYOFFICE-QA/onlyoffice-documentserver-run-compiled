@@ -1,6 +1,12 @@
 FROM debian:latest
 ARG build_branch=master
-RUN apt-get update && apt-get install -yq curl apt-transport-https ca-certificates sudo
+RUN apt-get update && \
+    apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    sudo
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 RUN apt-get update && apt-get install -y nodejs
 RUN npm install -g grunt-cli
