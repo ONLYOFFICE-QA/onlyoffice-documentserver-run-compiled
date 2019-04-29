@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-ARG build_branch=master
+ARG build_branch=release/v5.3.0
 RUN apt-get update && apt-get install -yq curl apt-transport-https ca-certificates sudo
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 RUN apt-get update && apt-get install -y nodejs
@@ -72,6 +72,8 @@ RUN service postgresql start && \
     sudo -u postgres psql -c "CREATE USER onlyoffice WITH password 'onlyoffice';" && \
     sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE onlyoffice TO onlyoffice;"
 RUN service postgresql start && \
+# Workaround https://bugs.launchpad.net/ubuntu/+source/postgresql-9.5/+bug/1826847
+    sleep 30 && \ 
     PGPASSWORD=onlyoffice psql -hlocalhost -Uonlyoffice -d onlyoffice -f /var/www/onlyoffice/documentserver/server/schema/postgresql/createdb.sql
 EXPOSE 80
 CMD service postgresql start && \

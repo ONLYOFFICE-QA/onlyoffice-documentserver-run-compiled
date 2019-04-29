@@ -73,6 +73,8 @@ RUN service postgresql start && \
     sudo -u postgres psql -c "CREATE USER onlyoffice WITH password 'onlyoffice';" && \
     sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE onlyoffice TO onlyoffice;"
 RUN service postgresql start && \
+# Workaround https://bugs.launchpad.net/ubuntu/+source/postgresql-9.5/+bug/1826847
+    sleep 30 && \ 
     PGPASSWORD=onlyoffice psql -hlocalhost -Uonlyoffice -d onlyoffice -f /var/www/onlyoffice/documentserver/server/schema/postgresql/createdb.sql
 EXPOSE 80
 CMD service postgresql start && \
