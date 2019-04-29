@@ -1,5 +1,5 @@
 FROM ubuntu:16.04
-ARG build_branch=release/v5.3.0
+ARG build_branch=master
 RUN apt-get update && apt-get install -yq curl apt-transport-https ca-certificates sudo
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 RUN apt-get update && apt-get install -y nodejs
