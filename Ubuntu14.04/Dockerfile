@@ -1,6 +1,14 @@
 FROM ubuntu:14.04
 ARG build_branch=master
 RUN apt-get update && apt-get install -yq curl apt-transport-https ca-certificates
+
+# Install java required by google-closure-compiler
+RUN echo "deb http://ppa.launchpad.net/linuxuprising/java/ubuntu bionic main" | tee /etc/apt/sources.list.d/linuxuprising-java.list
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 73C3DB2A
+RUN echo debconf shared/accepted-oracle-license-v1-2 select true | debconf-set-selections
+RUN apt-get update
+RUN apt-get install -y oracle-java11-installer
+
 RUN curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 RUN apt-get update && apt-get install -y nodejs
 RUN npm install -g grunt-cli
