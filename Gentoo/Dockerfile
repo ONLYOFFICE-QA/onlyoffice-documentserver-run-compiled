@@ -12,8 +12,6 @@ RUN cd /DocumentServer/core/Common/3dParty/boost && bash fetch.sh
 RUN cd /DocumentServer/core/Common/3dParty/boost && bash build.sh
 RUN cd /DocumentServer/core/Common/3dParty/cef && bash fetch.sh
 RUN cd /DocumentServer/core/Common/3dParty/cef && bash build.sh
-RUN cd /DocumentServer/core/Common/3dParty/curl && bash fetch.sh
-RUN cd /DocumentServer/core/Common/3dParty/curl && bash build.sh
 RUN cd /DocumentServer/core/Common/3dParty/icu && bash fetch.sh
 RUN sed -i 's/xlocale/locale/' /DocumentServer/core/Common/3dParty/icu/linux_64/icu/source/i18n/digitlst.cpp # See https://github.com/ONLYOFFICE/core/pull/90
 RUN cd /DocumentServer/core/Common/3dParty/icu && bash fetch.sh
