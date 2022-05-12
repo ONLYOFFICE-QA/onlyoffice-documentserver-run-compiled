@@ -22,8 +22,6 @@ LD_LIBRARY_PATH=${PWD}/server/FileConverter/bin server/tools/allthemesgen \
   --output="${PWD}/sdkjs/common/Images"
 cd /out/linux_64/onlyoffice/documentserver/server/FileConverter
 LD_LIBRARY_PATH=$PWD/bin NODE_ENV=development-linux NODE_CONFIG_DIR=$PWD/../Common/config ./converter &
-cd /out/linux_64/onlyoffice/documentserver/server/SpellChecker
-NODE_ENV=development-linux NODE_CONFIG_DIR=$PWD/../Common/config ./spellchecker &
 cd /out/linux_64/onlyoffice/documentserver/server/DocService
 NODE_ENV=development-linux NODE_CONFIG_DIR=$PWD/../Common/config ./docservice &
 bash
