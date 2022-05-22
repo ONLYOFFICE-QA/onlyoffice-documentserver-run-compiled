@@ -1,0 +1,56 @@
+FROM finalduty/archlinux:daily
+ARG build_branch=master
+RUN pacman -Syyu --noconfirm
+RUN pacman -S --noconfirm nodejs-lts-boron npm
+RUN npm install -g grunt-cli
+RUN pacman -S --noconfirm \
+    git
+RUN git clone --recursive https://github.com/ONLYOFFICE/DocumentServer.git
+RUN cd DocumentServer && git submodule foreach --recursive git checkout develop
+RUN pacman -S --noconfirm \
+    autoconf \
+    automake \
+    make \
+    git \
+    gcc \
+    java-runtime \
+    nginx \
+    p7zip \
+    postgresql \
+    pkg-config \
+    python2 \
+    sudo \
+    svn \
+    qt5-base \
+    wget
+RUN ln -sf /usr/bin/python2 /usr/bin/python    
+RUN cd DocumentServer/core/Common/3dParty && ./make.sh
+RUN cd DocumentServer/core && make
+RUN cd DocumentServer/sdkjs && make
+RUN cd DocumentServer/server && make
+RUN cd DocumentServer/server && make install
+RUN rm -f /etc/nginx/sites-enabled/default
+COPY onlyoffice-documentserver /etc/nginx/sites-available/onlyoffice-documentserver
+RUN mkdir -pv /etc/nginx/sites-enabled/
+RUN ln -s /etc/nginx/sites-available/onlyoffice-documentserver /etc/nginx/sites-enabled/onlyoffice-documentserver
+RUN systemctl start postgresql && \
+    sudo -u postgres psql -c "CREATE DATABASE onlyoffice;" && \
+    sudo -u postgres psql -c "CREATE USER onlyoffice WITH password 'onlyoffice';" && \
+    sudo -u postgres psql -c "GRANT ALL privileges ON DATABASE onlyoffice TO onlyoffice;"
+RUN service postgresql start && \
+    PGPASSWORD=onlyoffice psql -hlocalhost -Uonlyoffice -d onlyoffice -f /var/www/onlyoffice/documentserver/server/schema/postgresql/createdb.sql
+EXPOSE 80
+CMD service postgresql start && \
+    service rabbitmq-server start && \
+    service redis-server start && \
+    service nginx start && \
+    service postgresql start && \
+    (cd /var/www/onlyoffice/documentserver/server/FileConverter/sources/ && \
+    export NODE_ENV=production-linux NODE_CONFIG_DIR=/etc/onlyoffice/documentserver && \
+    sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/FileConverter/sources/convertermaster.js &) && \
+    (export NODE_ENV=production-linux NODE_CONFIG_DIR=/etc/onlyoffice/documentserver && \
+    sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/SpellChecker/sources/server.js &) && \
+    (export NODE_ENV=production-linux NODE_CONFIG_DIR=/etc/onlyoffice/documentserver && \
+    sudo -u onlyoffice -E node /var/www/onlyoffice/documentserver/server/DocService/sources/server.js &) && \
+    bash
+ 
